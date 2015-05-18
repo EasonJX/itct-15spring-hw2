@@ -1,3 +1,6 @@
+#ifndef __STRUCT_H
+#define __STRUCT_H
+
 #pragma pack(push)
 #pragma pack(1)
 
@@ -52,3 +55,5 @@ typedef struct {
 
 MarkerType marker_type(uint16_t marker);
 MarkerSegment *read_segment(FILE *fp);
+
+#endif
