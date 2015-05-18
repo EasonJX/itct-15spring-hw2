@@ -26,6 +26,19 @@ void parse_DQT(DQTSegment *seg)
     }
 }
 
+void parse_SOF0(SOF0Segment *seg)
+{
+    assert(seg->P == 8);
+    seg->height = be16toh(seg->height);
+    seg->width = be16toh(seg->width);
+    printf("Resolution: %dx%d\n", seg->width, seg->height);
+    for (int i = 0; i < seg->n_comp; i++) {
+        printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
+                i, seg->comp[i].C, seg->comp[i].H, seg->comp[i].V,
+                seg->comp[i].Tq);
+    }
+}
+
 void print_code(int code, int len)
 {
     for (int i = len - 1; i >= 0; i--) putchar('0' + ((code >> i) & 1));

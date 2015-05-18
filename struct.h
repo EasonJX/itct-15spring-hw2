@@ -21,6 +21,21 @@ typedef struct {
 } DQTSegment;
 
 typedef struct {
+    uint8_t C;
+    unsigned H:4;
+    unsigned V:4;
+    uint8_t Tq;
+} SOF0CompParams;
+
+typedef struct {
+    uint8_t P;
+    uint16_t height;
+    uint16_t width;
+    uint8_t n_comp;
+    SOF0CompParams comp[0];
+} SOF0Segment;
+
+typedef struct {
     uint8_t TcTh;
     uint8_t n_len[16];
     uint8_t sym[0];
@@ -49,6 +64,7 @@ typedef struct {
     union {
         APP0Segment *APP0;
         DQTSegment *DQT;
+        SOF0Segment *SOF0;
         DHTSegment *DHT;
         SOSSegment *SOS;
         char *COM;
