@@ -10,6 +10,7 @@ MarkerType marker_type(uint16_t marker)
     case 0xffc0: return SOF0;
     case 0xffc4: return DHT;
     case 0xffda: return SOS;
+    case 0xfffe: return COM;
     default: return UNKNOWN;
     }
 }

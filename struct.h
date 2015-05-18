@@ -31,6 +31,7 @@ typedef enum {
     SOF0,
     DHT,
     SOS,
+    COM,
     UNKNOWN
 } MarkerType;
 
@@ -42,6 +43,7 @@ typedef struct {
         DQTSegment *DQT;
         DHTSegment *DHT;
         SOSSegment *SOS;
+        char *COM;
         void *ptr;
     } data;
 } MarkerSegment;

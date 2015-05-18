@@ -25,6 +25,7 @@ int main(int argc, char **argv)
         case DQT: parse_DQT(seg->data.DQT); break;
         case DHT: parse_DHT(seg->data.DHT); break;
         case SOS: parse_SOS(seg->data.SOS); break;
+        case COM: parse_COM(seg); break;
         default:
             ;
         }
