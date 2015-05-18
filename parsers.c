@@ -6,9 +6,16 @@ void parse_APP0(APP0Segment *seg)
     printf("JPEG version %d.%d\n", seg->version[0], seg->version[1]);
 }
 
+uint8_t qt_zz_ac[64], qt_zz_dc[64];
+
 void parse_DQT(DQTSegment *seg)
 {
     assert(seg->PqTq >> 4 == 0);
+    if ((seg->PqTq & 0xf) == 0) {
+        memcpy(qt_zz_dc, seg->qt_zz, sizeof(qt_zz_dc));
+    } else if ((seg->PqTq & 0xf) == 1) {
+        memcpy(qt_zz_ac, seg->qt_zz, sizeof(qt_zz_ac));
+    }
     printf("Tq = %d\n", seg->PqTq & 0xf);
     printf("Quantization table:\n");
     uint8_t mat[8][8];
