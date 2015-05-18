@@ -21,6 +21,9 @@ typedef struct {
 } DQTSegment;
 
 typedef struct {
+    uint8_t TcTh;
+    uint8_t n_len[16];
+    uint8_t sym[0];
 } DHTSegment;
 
 typedef struct {

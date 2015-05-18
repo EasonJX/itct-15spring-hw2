@@ -26,8 +26,31 @@ void parse_DQT(DQTSegment *seg)
     }
 }
 
+void print_code(int code, int len)
+{
+    for (int i = len - 1; i >= 0; i--) putchar('0' + ((code >> i) & 1));
+}
+
+Node *huf[2][2];
+
 void parse_DHT(DHTSegment *seg)
 {
+    int Tc = seg->TcTh >> 4, Th = seg->TcTh & 0xf;
+    printf("Tc = %d, Th = %d\n", Tc, Th);
+    printf("# of length 1-16:");
+    for (int i = 0; i < 16; i++) printf(" %d", seg->n_len[i]);
+    printf("\n");
+    int code = 0, pos = 0;
+    for (int len = 1; len <= 16; len++) {
+        for (int i = 0; i < seg->n_len[len - 1]; i++) {
+            huffman_insert(&huf[Tc][Th], code, len, seg->sym[pos]);
+            print_code(code, len);
+            printf(": %d\n", seg->sym[pos]);
+            pos++;
+            code++;
+        }
+        if (code != 0) code <<= 1;
+    }
 }
 
 void parse_SOS(SOSSegment *seg)

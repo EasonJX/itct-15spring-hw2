@@ -8,3 +8,4 @@
 #include "struct.h"
 #include "parsers.h"
 #include "utils.h"
+#include "huffman.h"
