@@ -8,6 +8,15 @@ void parse_APP0(APP0Segment *seg)
 
 void parse_DQT(DQTSegment *seg)
 {
+    assert(seg->PqTq >> 4 == 0);
+    printf("Tq = %d\n", seg->PqTq | 0xf);
+    printf("Quantization table:\n");
+    uint8_t mat[8][8];
+    zigzag_to_mat(seg->qt_zz, mat);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
+        printf("\n");
+    }
 }
 
 void parse_DHT(DHTSegment *seg)

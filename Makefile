@@ -1,5 +1,5 @@
-CFLAGS += -O2 -Wall -Wno-unused-result
-OBJS = jpeg_decoder.o struct.o parsers.o
+CFLAGS += -std=gnu99 -O2 -Wall -Wno-unused-result
+OBJS = jpeg_decoder.o struct.o parsers.o utils.o
 EXEC = jpeg_decoder
 
 all: $(EXEC)

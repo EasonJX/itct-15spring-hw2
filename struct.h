@@ -13,6 +13,8 @@ typedef struct {
 } APP0Segment;
 
 typedef struct {
+    uint8_t PqTq;
+    uint8_t qt_zz[64];
 } DQTSegment;
 
 typedef struct {
