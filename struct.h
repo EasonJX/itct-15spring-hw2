@@ -12,6 +12,15 @@ typedef struct {
     uint8_t thumb_data[0];
 } APP0Segment;
 
+typedef struct {
+} DQTSegment;
+
+typedef struct {
+} DHTSegment;
+
+typedef struct {
+} SOSSegment;
+
 #pragma pack(pop)
 
 typedef enum {
@@ -30,6 +39,9 @@ typedef struct {
     uint16_t len;
     union {
         APP0Segment *APP0;
+        DQTSegment *DQT;
+        DHTSegment *DHT;
+        SOSSegment *SOS;
         void *ptr;
     } data;
 } MarkerSegment;

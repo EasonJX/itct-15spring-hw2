@@ -22,6 +22,9 @@ int main(int argc, char **argv)
         if (seg->type == EOI) break;
         switch (seg->type) {
         case APP0: parse_APP0(seg->data.APP0); break;
+        case DQT: parse_DQT(seg->data.DQT); break;
+        case DHT: parse_DHT(seg->data.DHT); break;
+        case SOS: parse_SOS(seg->data.SOS); break;
         default:
             ;
         }
