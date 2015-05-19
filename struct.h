@@ -22,8 +22,7 @@ typedef struct {
 
 typedef struct {
     uint8_t C;
-    unsigned H:4;
-    unsigned V:4;
+    uint8_t HV;
     uint8_t Tq;
 } SOF0CompParams;
 

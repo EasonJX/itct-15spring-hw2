@@ -33,9 +33,9 @@ void parse_SOF0(SOF0Segment *seg)
     seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     for (int i = 0; i < seg->n_comp; i++) {
+        int H = seg->comp[i].HV >> 4, V = seg->comp[i].HV & 0xf;
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
-                i, seg->comp[i].C, seg->comp[i].H, seg->comp[i].V,
-                seg->comp[i].Tq);
+                i, seg->comp[i].C, H, V, seg->comp[i].Tq);
     }
 }
 
