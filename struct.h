@@ -81,12 +81,13 @@ struct node_t {
 typedef struct node_t Node;
 
 typedef struct {
+    FILE *fp;
     uint16_t width, height;
     uint8_t qt_zz[4][64];
     Node *huf[2][2];
 } JPEGData;
 
 MarkerType marker_type(uint16_t marker);
-MarkerSegment *read_segment(FILE *fp);
+MarkerSegment *read_segment();
 
 #endif

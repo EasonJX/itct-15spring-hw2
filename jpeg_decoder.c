@@ -8,18 +8,18 @@ int main(int argc, char **argv)
         printf("Usage: %s <file>\n", argv[0]);
         return 1;
     }
-    FILE *fp = fopen(argv[1], "r");
-    if (fp == NULL) {
+    jpg.fp = fopen(argv[1], "r");
+    if (jpg.fp == NULL) {
         perror(argv[1]);
         return 1;
     }
 
     MarkerSegment *seg;
-    seg = read_segment(fp);
+    seg = read_segment();
     assert(seg->type == SOI);
     free(seg);
     while (1) {
-        seg = read_segment(fp);
+        seg = read_segment();
         if (seg == NULL) break;
         if (seg->type == EOI) break;
         switch (seg->type) {
@@ -35,6 +35,6 @@ int main(int argc, char **argv)
         if (seg->data.ptr != NULL) free(seg->data.ptr);
         free(seg);
     }
-    fclose(fp);
+    fclose(jpg.fp);
     return 0;
 }

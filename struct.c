@@ -1,5 +1,7 @@
 #include "jpeg_decoder.h"
 
+extern JPEGData jpg;
+
 MarkerType marker_type(uint16_t marker)
 {
     switch (marker) {
@@ -15,11 +17,11 @@ MarkerType marker_type(uint16_t marker)
     }
 }
 
-MarkerSegment *read_segment(FILE *fp)
+MarkerSegment *read_segment()
 {
     MarkerSegment *seg = (MarkerSegment*)malloc(sizeof(MarkerSegment));
     uint16_t marker;
-    fread(&marker, sizeof(uint16_t), 1, fp);
+    fread(&marker, sizeof(uint16_t), 1, jpg.fp);
     marker = be16toh(marker);
     seg->type = marker_type(marker);
     switch (seg->type) {
@@ -33,10 +35,10 @@ MarkerSegment *read_segment(FILE *fp)
         free(seg);
         return NULL;
     default:
-        fread(&seg->len, sizeof(uint16_t), 1, fp);
+        fread(&seg->len, sizeof(uint16_t), 1, jpg.fp);
         seg->len = be16toh(seg->len);
         seg->data.ptr = malloc(seg->len - 2);
-        fread(seg->data.ptr, seg->len - 2, 1, fp);
+        fread(seg->data.ptr, seg->len - 2, 1, jpg.fp);
     }
     printf("read segment, marker = %x, len = %d\n", marker, seg->len);
     return seg;
