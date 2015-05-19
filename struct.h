@@ -1,6 +1,9 @@
 #ifndef __STRUCT_H
 #define __STRUCT_H
 
+#define HI(x) ((x) >> 4)
+#define LO(x) ((x) & 0xf)
+
 #pragma pack(push)
 #pragma pack(1)
 

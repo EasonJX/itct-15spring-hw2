@@ -10,13 +10,14 @@ uint8_t qt_zz_ac[64], qt_zz_dc[64];
 
 void parse_DQT(DQTSegment *seg)
 {
-    assert(seg->PqTq >> 4 == 0);
-    if ((seg->PqTq & 0xf) == 0) {
+    int Pq = HI(seg->PqTq), Tq = LO(seg->PqTq);
+    assert(Pq == 0);
+    if (Tq == 0) {
         memcpy(qt_zz_dc, seg->qt_zz, sizeof(qt_zz_dc));
-    } else if ((seg->PqTq & 0xf) == 1) {
+    } else if (Tq == 1) {
         memcpy(qt_zz_ac, seg->qt_zz, sizeof(qt_zz_ac));
     }
-    printf("Tq = %d\n", seg->PqTq & 0xf);
+    printf("Tq = %d\n", Tq);
     printf("Quantization table:\n");
     uint8_t mat[8][8];
     zigzag_to_mat(seg->qt_zz, mat);
@@ -33,7 +34,7 @@ void parse_SOF0(SOF0Segment *seg)
     seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     for (int i = 0; i < seg->n_comp; i++) {
-        int H = seg->comp[i].HV >> 4, V = seg->comp[i].HV & 0xf;
+        int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
                 i, seg->comp[i].C, H, V, seg->comp[i].Tq);
     }
@@ -48,7 +49,7 @@ Node *huf[2][2];
 
 void parse_DHT(DHTSegment *seg)
 {
-    int Tc = seg->TcTh >> 4, Th = seg->TcTh & 0xf;
+    int Tc = HI(seg->TcTh), Th = LO(seg->TcTh);
     printf("Tc = %d, Th = %d\n", Tc, Th);
     printf("# of length 1-16:");
     for (int i = 0; i < 16; i++) printf(" %d", seg->n_len[i]);
