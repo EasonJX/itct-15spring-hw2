@@ -1,5 +1,7 @@
 #include "jpeg_decoder.h"
 
+JPEGData jpg;
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {

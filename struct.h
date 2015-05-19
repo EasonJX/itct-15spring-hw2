@@ -74,6 +74,18 @@ typedef struct {
     } data;
 } MarkerSegment;
 
+struct node_t {
+    uint8_t sym;
+    struct node_t *child[2];
+};
+typedef struct node_t Node;
+
+typedef struct {
+    uint16_t width, height;
+    uint8_t qt_zz[4][64];
+    Node *huf[2][2];
+} JPEGData;
+
 MarkerType marker_type(uint16_t marker);
 MarkerSegment *read_segment(FILE *fp);
 

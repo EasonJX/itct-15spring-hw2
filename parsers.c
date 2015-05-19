@@ -1,22 +1,18 @@
 #include "jpeg_decoder.h"
 
+extern JPEGData jpg;
+
 void parse_APP0(APP0Segment *seg)
 {
     assert(strcmp(seg->JFIF, "JFIF") == 0);
     printf("JPEG version %d.%d\n", seg->version[0], seg->version[1]);
 }
 
-uint8_t qt_zz_ac[64], qt_zz_dc[64];
-
 void parse_DQT(DQTSegment *seg)
 {
     int Pq = HI(seg->PqTq), Tq = LO(seg->PqTq);
     assert(Pq == 0);
-    if (Tq == 0) {
-        memcpy(qt_zz_dc, seg->qt_zz, sizeof(qt_zz_dc));
-    } else if (Tq == 1) {
-        memcpy(qt_zz_ac, seg->qt_zz, sizeof(qt_zz_ac));
-    }
+    memcpy(jpg.qt_zz[Tq], seg->qt_zz, 64);
     printf("Tq = %d\n", Tq);
     printf("Quantization table:\n");
     uint8_t mat[8][8];
@@ -30,8 +26,8 @@ void parse_DQT(DQTSegment *seg)
 void parse_SOF0(SOF0Segment *seg)
 {
     assert(seg->P == 8);
-    seg->height = be16toh(seg->height);
-    seg->width = be16toh(seg->width);
+    jpg.height = seg->height = be16toh(seg->height);
+    jpg.width = seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     for (int i = 0; i < seg->n_comp; i++) {
         int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
@@ -45,8 +41,6 @@ void print_code(int code, int len)
     for (int i = len - 1; i >= 0; i--) putchar('0' + ((code >> i) & 1));
 }
 
-Node *huf[2][2];
-
 void parse_DHT(DHTSegment *seg)
 {
     int Tc = HI(seg->TcTh), Th = LO(seg->TcTh);
@@ -57,7 +51,7 @@ void parse_DHT(DHTSegment *seg)
     int code = 0, pos = 0;
     for (int len = 1; len <= 16; len++) {
         for (int i = 0; i < seg->n_len[len - 1]; i++) {
-            huffman_insert(&huf[Tc][Th], code, len, seg->sym[pos]);
+            huffman_insert(&jpg.huf[Tc][Th], code, len, seg->sym[pos]);
             print_code(code, len);
             printf(": %d\n", seg->sym[pos]);
             pos++;
