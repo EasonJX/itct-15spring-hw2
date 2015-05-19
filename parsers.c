@@ -30,11 +30,20 @@ void parse_SOF0(SOF0Segment *seg)
     jpg.width = seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     jpg.n_comp = seg->n_comp;
+    int maxH = 0, maxV = 0;
     for (int i = 0; i < seg->n_comp; i++) {
         int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
-        jpg.comp[i] = (Component){seg->comp[i].C, H, V, seg->comp[i].Tq, 0, 0};
+        maxH = MAX(maxH, H);
+        maxV = MAX(maxV, V);
+        jpg.comp[i] = (Component){seg->comp[i].C, H, V, seg->comp[i].Tq};
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
                 i, seg->comp[i].C, H, V, seg->comp[i].Tq);
+    }
+    for (int i = 0; i < seg->n_comp; i++) {
+        jpg.comp[i].width = (int)jpg.width * jpg.comp[i].H / maxH;
+        jpg.comp[i].height = (int)jpg.height * jpg.comp[i].V / maxV;
+        printf("Component %d: (x, y) = (%d, %d)\n",
+                i, jpg.comp[i].width, jpg.comp[i].height);
     }
 }
 

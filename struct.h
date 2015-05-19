@@ -94,6 +94,8 @@ typedef struct {
     uint8_t Tq;
     uint8_t Td;
     uint8_t Ta;
+    uint16_t width;
+    uint16_t height;
 } Component;
 
 typedef struct {
