@@ -31,6 +31,7 @@ void parse_SOF0(SOF0Segment *seg)
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     for (int i = 0; i < seg->n_comp; i++) {
         int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
+        jpg.comp[seg->comp[i].C] = (Component){H, V, seg->comp[i].Tq};
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
                 i, seg->comp[i].C, H, V, seg->comp[i].Tq);
     }

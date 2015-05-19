@@ -81,8 +81,15 @@ struct node_t {
 typedef struct node_t Node;
 
 typedef struct {
+    uint8_t H;
+    uint8_t V;
+    uint8_t Tq;
+} Component;
+
+typedef struct {
     FILE *fp;
     uint16_t width, height;
+    Component comp[256];
     uint8_t qt_zz[4][64];
     Node *huf[2][2];
 } JPEGData;
