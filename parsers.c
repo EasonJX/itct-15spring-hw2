@@ -29,9 +29,10 @@ void parse_SOF0(SOF0Segment *seg)
     jpg.height = seg->height = be16toh(seg->height);
     jpg.width = seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
+    jpg.n_comp = seg->n_comp;
     for (int i = 0; i < seg->n_comp; i++) {
         int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
-        jpg.comp[seg->comp[i].C] = (Component){H, V, seg->comp[i].Tq};
+        jpg.comp[i] = (Component){seg->comp[i].C, H, V, seg->comp[i].Tq, 0, 0};
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
                 i, seg->comp[i].C, H, V, seg->comp[i].Tq);
     }
@@ -64,6 +65,23 @@ void parse_DHT(DHTSegment *seg)
 
 void parse_SOS(SOSSegment *seg)
 {
+    for (int i = 0; i < seg->n_comp; i++) {
+        int Td = HI(seg->comp[i].TdTa), Ta = LO(seg->comp[i].TdTa);
+        assert(jpg.comp[i].C == seg->comp[i].Cs);
+        jpg.comp[i].Td = Td;
+        jpg.comp[i].Ta = Ta;
+        printf("Component %d: Cs = %d, Td = %d, Ta = %d\n",
+                i, seg->comp[i].Cs, Td, Ta);
+    }
+    int Ss = seg->comp[seg->n_comp].Cs,
+        Se = seg->comp[seg->n_comp].TdTa,
+        Ah = HI(seg->comp[seg->n_comp + 1].Cs),
+        Al = LO(seg->comp[seg->n_comp + 1].Cs);
+    assert(Ss == 0);
+    assert(Se == 63);
+    assert(Ah == 0);
+    assert(Al == 0);
+    do_scan();
 }
 
 void parse_COM(MarkerSegment *seg)

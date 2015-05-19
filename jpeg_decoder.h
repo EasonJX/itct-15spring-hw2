@@ -9,3 +9,4 @@
 #include "parsers.h"
 #include "utils.h"
 #include "huffman.h"
+#include "scan.h"

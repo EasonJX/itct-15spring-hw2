@@ -44,6 +44,13 @@ typedef struct {
 } DHTSegment;
 
 typedef struct {
+    uint8_t Cs;
+    uint8_t TdTa;
+} SOSCompParams;
+
+typedef struct {
+    uint8_t n_comp;
+    SOSCompParams comp[0];
 } SOSSegment;
 
 #pragma pack(pop)
@@ -81,15 +88,19 @@ struct node_t {
 typedef struct node_t Node;
 
 typedef struct {
+    uint8_t C;
     uint8_t H;
     uint8_t V;
     uint8_t Tq;
+    uint8_t Td;
+    uint8_t Ta;
 } Component;
 
 typedef struct {
     FILE *fp;
     uint16_t width, height;
-    Component comp[256];
+    uint8_t n_comp;
+    Component comp[4];
     uint8_t qt_zz[4][64];
     Node *huf[2][2];
 } JPEGData;
