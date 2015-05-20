@@ -12,3 +12,4 @@
 #include "huffman.h"
 #include "scan.h"
 #include "dct.h"
+#include "output.h"

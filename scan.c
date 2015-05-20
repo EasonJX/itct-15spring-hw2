@@ -89,6 +89,11 @@ void do_scan()
                     for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
                     printf("\n");
                 }
+                for (int i = 0; i < 8 && v*8 + i < jpg.comp[i].height; i++) {
+                    for (int j = 0; j < 8 && h*8 + j < jpg.comp[i].width; j++) {
+                        jpg.bmp_YCbCr[cid][v*8 + i][h*8 + j] = mat[i][j];
+                    }
+                }
             }
         }
     }

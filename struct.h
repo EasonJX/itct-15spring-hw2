@@ -107,6 +107,8 @@ typedef struct {
     Component comp[4];
     int8_t qt_zz[4][64];
     Node *huf[2][2];
+    uint8_t **bmp_YCbCr[4];
+    uint8_t **bmp_RGB[4];
 } JPEGData;
 
 MarkerType marker_type(uint16_t marker);

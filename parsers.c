@@ -28,6 +28,12 @@ void parse_SOF0(SOF0Segment *seg)
     assert(seg->P == 8);
     jpg.height = seg->height = be16toh(seg->height);
     jpg.width = seg->width = be16toh(seg->width);
+    for (int i = 0; i < 3; i++) {
+        jpg.bmp_RGB[i] = (uint8_t**)malloc(jpg.height * sizeof(uint8_t*));
+        for (int j = 0; j < jpg.height; j++) {
+            jpg.bmp_RGB[i][j] = (uint8_t*)malloc(jpg.width);
+        }
+    }
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     jpg.n_comp = seg->n_comp;
     jpg.maxH = jpg.maxV = 0;
@@ -44,6 +50,10 @@ void parse_SOF0(SOF0Segment *seg)
         jpg.comp[i].height = (int)jpg.height * jpg.comp[i].V / jpg.maxV;
         printf("Component %d: (x, y) = (%d, %d)\n",
                 i, jpg.comp[i].width, jpg.comp[i].height);
+        jpg.bmp_YCbCr[i] = (uint8_t**)malloc(jpg.comp[i].height * sizeof(uint8_t*));
+        for (int j = 0; j < jpg.comp[i].height; j++) {
+            jpg.bmp_YCbCr[i][j] = (uint8_t*)malloc(jpg.comp[i].width);
+        }
     }
 }
 
@@ -91,6 +101,7 @@ void parse_SOS(SOSSegment *seg)
     assert(Ah == 0);
     assert(Al == 0);
     do_scan();
+    do_output();
 }
 
 void parse_COM(MarkerSegment *seg)
