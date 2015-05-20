@@ -14,9 +14,12 @@ void do_output()
             double Y = jpg.bmp_YCbCr[0][x][y],
                    Cr = jpg.bmp_YCbCr[1][MIN(x/scale_Cr_x, jpg.comp[1].height-1)][MIN(y/scale_Cr_y, jpg.comp[1].width-1)],
                    Cb = jpg.bmp_YCbCr[2][MIN(x/scale_Cb_x, jpg.comp[1].height-1)][MIN(y/scale_Cb_y, jpg.comp[2].width-1)];
-            jpg.bmp_RGB[0][x][y] = round(Y + 1.402 * (Cr - 128.0));
-            jpg.bmp_RGB[1][x][y] = round(Y - 0.34414 * (Cb - 128.0) - 0.71414 * (Cr - 128.0));
-            jpg.bmp_RGB[2][x][y] = round(Y + 1.772 * (Cb - 128.0));
+            int R = round(Y + 1.402 * (Cr - 128.0)),
+                G = round(Y - 0.34414 * (Cb - 128.0) - 0.71414 * (Cr - 128.0)),
+                B = round(Y + 1.772 * (Cb - 128.0));
+            jpg.bmp_RGB[0][x][y] = MIN(R, 255);
+            jpg.bmp_RGB[1][x][y] = MIN(G, 255);
+            jpg.bmp_RGB[2][x][y] = MIN(B, 255);
         }
     }
     // generate bmp
