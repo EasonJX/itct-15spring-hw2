@@ -15,3 +15,13 @@ void huffman_insert(Node **node, int code, int len, uint8_t sym)
         huffman_insert(&(*node)->child[c], code, len - 1, sym);
     }
 }
+
+Node *huffman_traverse(Node *node, uint8_t byte, int *p_pos)
+{
+    assert(node != NULL);
+    while (*p_pos >= 0 && node->child[(byte >> *p_pos) & 1] != NULL) {
+        node = node->child[(byte >> *p_pos) & 1];
+        (*p_pos)--;
+    }
+    return node;
+}
