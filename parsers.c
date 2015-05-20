@@ -15,10 +15,10 @@ void parse_DQT(DQTSegment *seg)
     memcpy(jpg.qt_zz[Tq], seg->qt_zz, 64);
     printf("Tq = %d\n", Tq);
     printf("Quantization table:\n");
-    double mat[8][8];
+    int8_t mat[8][8];
     zigzag_to_mat(seg->qt_zz, mat);
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) printf("%.0f ", mat[i][j]);
+        for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
         printf("\n");
     }
 }
