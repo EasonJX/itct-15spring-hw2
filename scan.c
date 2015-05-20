@@ -40,9 +40,9 @@ int16_t extend(uint16_t diff, uint8_t len)
     return ret;
 }
 
-void decode_block(int8_t b_zz[64], Component *comp, uint8_t *p_byte, int *p_pos)
+void decode_block(int16_t b_zz[64], Component *comp, uint8_t *p_byte, int *p_pos)
 {
-    memset(b_zz, 0, 64);
+    memset(b_zz, 0, sizeof(int16_t[64]));
     uint8_t len = decode(jpg.huf[0][comp->Td], p_byte, p_pos);
     b_zz[0] = comp->pred + extend(retrieve(p_byte, p_pos, len), len);
     comp->pred = b_zz[0];
@@ -70,12 +70,13 @@ void do_scan()
     printf("cnt_v = %d, cnt_h = %d\n", cnt_v, cnt_h);
     for (int v = 0; v < cnt_v; v++) for (int h = 0; h < cnt_h; h++) {
         for (int cid = 0; cid < jpg.n_comp; cid++) {
-            for (int k = 0; k < jpg.comp[cid].H * jpg.comp[cid].V; k++) {
-                int8_t b_zz[64];
+            int V = jpg.comp[cid].V, H = jpg.comp[cid].H;
+            for (int vv = 0; vv < V; vv++) for (int hh = 0; hh < H; hh++) {
+                int16_t b_zz[64];
                 decode_block(b_zz, &jpg.comp[cid], &byte, &pos);
                 printf("====\n");
-                printf("Component %d, block %d\n", cid, k);
-                int8_t mat[8][8];
+                printf("Component %d, block (%d, %d)\n", cid, V*v + vv, H*h + hh);
+                int16_t mat[8][8];
                 zigzag_to_mat(b_zz, mat);
                 double fmat[8][8];
                 for (int i = 0; i < 8; i++) {
@@ -89,9 +90,9 @@ void do_scan()
                     for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
                     printf("\n");
                 }
-                for (int i = 0; i < 8 && v*8 + i < jpg.comp[i].height; i++) {
-                    for (int j = 0; j < 8 && h*8 + j < jpg.comp[i].width; j++) {
-                        jpg.bmp_YCbCr[cid][v*8 + i][h*8 + j] = mat[i][j];
+                for (int i = 0; i < 8 && V*v*8 + vv*8 + i < jpg.comp[cid].height; i++) {
+                    for (int j = 0; j < 8 && H*h*8 + hh*8 + j < jpg.comp[cid].width; j++) {
+                        jpg.bmp_YCbCr[cid][V*v*8 + vv*8 + i][H*h*8 + hh*8 + j] = mat[i][j] + 128;
                     }
                 }
             }
