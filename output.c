@@ -17,9 +17,9 @@ void do_output()
             int R = round(Y + 1.402 * (Cr - 128.0)),
                 G = round(Y - 0.34414 * (Cb - 128.0) - 0.71414 * (Cr - 128.0)),
                 B = round(Y + 1.772 * (Cb - 128.0));
-            jpg.bmp_RGB[0][x][y] = MIN(R, 255);
-            jpg.bmp_RGB[1][x][y] = MIN(G, 255);
-            jpg.bmp_RGB[2][x][y] = MIN(B, 255);
+            jpg.bmp_RGB[0][x][y] = MAX(MIN(R, 255), 0);
+            jpg.bmp_RGB[1][x][y] = MAX(MIN(G, 255), 0);
+            jpg.bmp_RGB[2][x][y] = MAX(MIN(B, 255), 0);
         }
     }
     // generate bmp

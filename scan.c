@@ -92,7 +92,7 @@ void do_scan()
                 }
                 for (int i = 0; i < 8 && V*v*8 + vv*8 + i < jpg.comp[cid].height; i++) {
                     for (int j = 0; j < 8 && H*h*8 + hh*8 + j < jpg.comp[cid].width; j++) {
-                        jpg.bmp_YCbCr[cid][V*v*8 + vv*8 + i][H*h*8 + hh*8 + j] = mat[i][j] + 128;
+                        jpg.bmp_YCbCr[cid][V*v*8 + vv*8 + i][H*h*8 + hh*8 + j] = MAX(MIN(mat[i][j] + 128, 255), 0);
                     }
                 }
             }
