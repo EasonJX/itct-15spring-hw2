@@ -5,10 +5,11 @@ void idct(double *arr, int n)
     // O(n^2)
     double *v = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
-        v[i] = arr[0] / sqrt(n);
-        for (int j = 1; j < n; j++) {
-            v[i] += sqrt(2.0 / n) * arr[j] * cos(PI * j * (i + 0.5) / 8.0);
+        v[i] = 0;
+        for (int j = 0; j < n; j++) {
+            v[i] += arr[j] * cos(PI * j * (i + 0.5) / n) / (j == 0 ? sqrt(2.0) : 1.0);
         }
+        v[i] /= 2.0;
     }
     for (int i = 0; i < n; i++) arr[i] = v[i];
     free(v);
