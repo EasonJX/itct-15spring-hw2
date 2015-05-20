@@ -77,6 +77,14 @@ void do_scan()
                 printf("Component %d, block %d\n", cid, k);
                 int8_t mat[8][8];
                 zigzag_to_mat(b_zz, mat);
+                double fmat[8][8];
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 8; j++) fmat[i][j] = mat[i][j];
+                }
+                idct8x8(fmat);
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 8; j++) mat[i][j] = round(fmat[i][j]);
+                }
                 for (int i = 0; i < 8; i++) {
                     for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
                     printf("\n");
