@@ -20,7 +20,7 @@ typedef struct {
 
 typedef struct {
     uint8_t PqTq;
-    uint8_t qt_zz[64];
+    int8_t qt_zz[64];
 } DQTSegment;
 
 typedef struct {
@@ -96,14 +96,16 @@ typedef struct {
     uint8_t Ta;
     uint16_t width;
     uint16_t height;
+    uint16_t pred;
 } Component;
 
 typedef struct {
     FILE *fp;
     uint16_t width, height;
+    uint8_t maxH, maxV;
     uint8_t n_comp;
     Component comp[4];
-    uint8_t qt_zz[4][64];
+    int8_t qt_zz[4][64];
     Node *huf[2][2];
 } JPEGData;
 

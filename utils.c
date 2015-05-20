@@ -1,6 +1,6 @@
 #include "jpeg_decoder.h"
 
-void zigzag_to_mat(uint8_t zigzag[64], uint8_t mat[8][8])
+void zigzag_to_mat(int8_t zigzag[64], int8_t mat[8][8])
 {
     int x = 0, y = 0, dir = 0;
     for (int i = 0; i < 36; i++) {

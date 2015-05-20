@@ -15,7 +15,7 @@ void parse_DQT(DQTSegment *seg)
     memcpy(jpg.qt_zz[Tq], seg->qt_zz, 64);
     printf("Tq = %d\n", Tq);
     printf("Quantization table:\n");
-    uint8_t mat[8][8];
+    int8_t mat[8][8];
     zigzag_to_mat(seg->qt_zz, mat);
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
@@ -30,18 +30,18 @@ void parse_SOF0(SOF0Segment *seg)
     jpg.width = seg->width = be16toh(seg->width);
     printf("Resolution: %dx%d\n", seg->width, seg->height);
     jpg.n_comp = seg->n_comp;
-    int maxH = 0, maxV = 0;
+    jpg.maxH = jpg.maxV = 0;
     for (int i = 0; i < seg->n_comp; i++) {
         int H = HI(seg->comp[i].HV), V = LO(seg->comp[i].HV);
-        maxH = MAX(maxH, H);
-        maxV = MAX(maxV, V);
+        jpg.maxH = MAX(jpg.maxH, H);
+        jpg.maxV = MAX(jpg.maxV, V);
         jpg.comp[i] = (Component){seg->comp[i].C, H, V, seg->comp[i].Tq};
         printf("Component %d: C = %d, H = %d, V = %d, Tq = %d\n",
                 i, seg->comp[i].C, H, V, seg->comp[i].Tq);
     }
     for (int i = 0; i < seg->n_comp; i++) {
-        jpg.comp[i].width = (int)jpg.width * jpg.comp[i].H / maxH;
-        jpg.comp[i].height = (int)jpg.height * jpg.comp[i].V / maxV;
+        jpg.comp[i].width = (int)jpg.width * jpg.comp[i].H / jpg.maxH;
+        jpg.comp[i].height = (int)jpg.height * jpg.comp[i].V / jpg.maxV;
         printf("Component %d: (x, y) = (%d, %d)\n",
                 i, jpg.comp[i].width, jpg.comp[i].height);
     }
