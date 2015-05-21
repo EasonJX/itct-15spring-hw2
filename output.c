@@ -24,7 +24,7 @@ void do_output()
     }
     // generate bmp
     bmpfile_t *bmp;
-    bmp = bmp_create(jpg.width, jpg.height, 8);
+    bmp = bmp_create(jpg.width, jpg.height, 24);
     assert(bmp != NULL);
     for (int x = 0; x < jpg.height; x++) {
         for (int y = 0; y < jpg.width; y++) {
