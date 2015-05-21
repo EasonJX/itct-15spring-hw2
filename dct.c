@@ -1,35 +1,62 @@
 #include "jpeg_decoder.h"
 
-void idct(double *arr, int n)
+double s[4], c[5], sq8;
+int idct_inited;
+
+static void idct_init()
 {
-    // O(n^2)
-    double *v = (double*)malloc(n * sizeof(double));
-    for (int i = 0; i < n; i++) {
-        v[i] = 0;
-        for (int j = 0; j < n; j++) {
-            v[i] += arr[j] * cos(PI * j * (i + 0.5) / n) / (j == 0 ? sqrt(2.0) : 1.0);
-        }
-        v[i] /= 2.0;
-    }
-    for (int i = 0; i < n; i++) arr[i] = v[i];
-    free(v);
+    double PI = acos(-1.0);
+    for (int i = 1; i < 4; i++) s[i] = sin(i * PI / 16.0);
+    for (int i = 1; i < 5; i++) c[i] = cos(i * PI / 16.0);
+    sq8 = sqrt(8.0);
+    idct_inited = 1;
 }
 
-void transpose8x8(double mat[8][8])
+void idct8(double *F, double *f)
 {
-    for (int i = 0; i < 8; i++) {
-        for (int j = i + 1; j < 8; j++) {
-            double tmp = mat[i][j];
-            mat[i][j] = mat[j][i];
-            mat[j][i] = tmp;
-        }
-    }
+    double t[2][8];
+    t[0][0] = F[0] / sq8 + F[4] / sq8;
+    t[0][1] = F[0] / sq8 - F[4] / sq8;
+    t[0][2] = F[2] / 2.0 * s[2] - F[6] / 2.0 * c[2];
+    t[0][3] = F[2] / 2.0 * c[2] + F[6] / 2.0 * s[2];
+    t[0][4] = F[1] / 2.0 * c[1] + F[7] / 2.0 * s[1];
+    t[0][5] = F[1] / 2.0 * s[1] - F[7] / 2.0 * c[1];
+    t[0][6] = F[3] / 2.0 * c[3] + F[5] / 2.0 * s[3];
+    t[0][7] = F[3] / 2.0 * s[3] - F[5] / 2.0 * c[3];
+    t[1][0] = t[0][0] + t[0][3];
+    t[1][1] = t[0][1] + t[0][2];
+    t[1][2] = t[0][1] - t[0][2];
+    t[1][3] = t[0][0] - t[0][3];
+    t[1][4] = t[0][4] + t[0][6];
+    t[1][5] = (t[0][5] + t[0][7]) * c[4];
+    t[1][6] = (t[0][4] - t[0][6]) * c[4];
+    t[1][7] = t[0][5] - t[0][7];
+    t[0][5] = t[1][5] + t[1][6];
+    t[0][6] = t[1][5] - t[1][6];
+    t[1][5] = t[0][5];
+    t[1][6] = t[0][6];
+    t[0][0] = t[1][0] + t[1][4];
+    t[0][1] = t[1][1] + t[1][5];
+    t[0][2] = t[1][2] + t[1][6];
+    t[0][3] = t[1][3] + t[1][7];
+    t[0][4] = t[1][0] - t[1][4];
+    t[0][5] = t[1][1] - t[1][5];
+    t[0][6] = t[1][2] - t[1][6];
+    t[0][7] = t[1][3] - t[1][7];
+    f[8*0] = t[0][0];
+    f[8*1] = t[0][1];
+    f[8*2] = t[0][6];
+    f[8*3] = t[0][3];
+    f[8*4] = t[0][7];
+    f[8*5] = t[0][2];
+    f[8*6] = t[0][5];
+    f[8*7] = t[0][4];
 }
 
 void idct8x8(double mat[8][8])
 {
-    for (int i = 0; i < 8; i++) idct(mat[i], 8);
-    transpose8x8(mat);
-    for (int i = 0; i < 8; i++) idct(mat[i], 8);
-    transpose8x8(mat);
+    if (!idct_inited) idct_init();
+    double *x = (double*)mat, y[64];
+    for (int i = 0; i < 8; i++) idct8(x + 8*i, y + i);
+    for (int i = 0; i < 8; i++) idct8(y + 8*i, x + i);
 }
