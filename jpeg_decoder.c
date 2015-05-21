@@ -8,7 +8,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         return 1;
     }
-    jpg.fp = fopen(argv[1], "r");
+    jpg.fp = fopen(argv[1], "rb");
     if (jpg.fp == NULL) {
         perror(argv[1]);
         return 1;
