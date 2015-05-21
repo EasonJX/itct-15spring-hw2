@@ -31,7 +31,7 @@ MarkerSegment *read_segment()
         seg->data.ptr = NULL;
         break;
     case UNKNOWN:
-        printf("unknown marker %x\n", marker);
+        fprintf(stderr, "unknown marker %x\n", marker);
         free(seg);
         return NULL;
     default:
