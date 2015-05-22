@@ -9,7 +9,7 @@ void parse_APP0(APP0Segment *seg)
     fprintf(log_fp, "JPEG version %d.%d\n", seg->version[0], seg->version[1]);
 }
 
-void parse_DQT(DQTSegment *seg)
+void parse_DQT(DQTSegment *seg, int seg_len)
 {
     int Pq = HI(seg->PqTq), Tq = LO(seg->PqTq);
     assert(Pq == 0);
@@ -23,6 +23,8 @@ void parse_DQT(DQTSegment *seg)
         for (int j = 0; j < 8; j++) fprintf(log_fp, "%d ", mat[i][j]);
         fprintf(log_fp, "\n");
     }
+    int off = sizeof(DQTSegment);
+    if (off != seg_len) parse_DQT((void*)seg + off, seg_len - off);
 }
 
 void parse_SOF0(SOF0Segment *seg)
@@ -64,14 +66,14 @@ void print_code(int code, int len)
     for (int i = len - 1; i >= 0; i--) fputc('0' + ((code >> i) & 1), log_fp);
 }
 
-void parse_DHT(DHTSegment *seg)
+void parse_DHT(DHTSegment *seg, int seg_len)
 {
     int Tc = HI(seg->TcTh), Th = LO(seg->TcTh);
     fprintf(log_fp, "Tc = %d, Th = %d\n", Tc, Th);
     fprintf(log_fp, "# of length 1-16:");
     for (int i = 0; i < 16; i++) fprintf(log_fp, " %d", seg->n_len[i]);
     fprintf(log_fp, "\n");
-    int code = 0, pos = 0;
+    int code = 0, pos = 0, off = sizeof(DHTSegment);
     for (int len = 1; len <= 16; len++) {
         for (int i = 0; i < seg->n_len[len - 1]; i++) {
             huffman_insert(&jpg.huf[Tc][Th], code, len, seg->sym[pos]);
@@ -81,7 +83,9 @@ void parse_DHT(DHTSegment *seg)
             code++;
         }
         if (code != 0) code <<= 1;
+        off += seg->n_len[len - 1];
     }
+    if (off != seg_len) parse_DHT((void*)seg + off, seg_len - off);
 }
 
 void parse_SOS(SOSSegment *seg)
