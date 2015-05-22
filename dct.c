@@ -1,15 +1,13 @@
 #include "jpeg_decoder.h"
 
 double s[4], c[5], sq8;
-int idct_inited;
 
-static void idct_init()
+void idct_init()
 {
     double PI = acos(-1.0);
     for (int i = 1; i < 4; i++) s[i] = sin(i * PI / 16.0);
     for (int i = 1; i < 5; i++) c[i] = cos(i * PI / 16.0);
     sq8 = sqrt(8.0);
-    idct_inited = 1;
 }
 
 void idct8(double *F, double *f)
@@ -55,7 +53,6 @@ void idct8(double *F, double *f)
 
 void idct8x8(double mat[8][8])
 {
-    if (!idct_inited) idct_init();
     double *x = (double*)mat, y[64];
     for (int i = 0; i < 8; i++) idct8(x + 8*i, y + i);
     for (int i = 0; i < 8; i++) idct8(y + 8*i, x + i);

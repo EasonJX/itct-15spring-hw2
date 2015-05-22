@@ -61,9 +61,78 @@ void decode_block(int16_t b_zz[64], Component *comp, uint8_t *p_byte, int *p_pos
     }
 }
 
+IDCTWork *work_list, *work_list_back;
+pthread_mutex_t work_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t work_list_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void do_idct_work(IDCTWork *work)
+{
+    int16_t *b_zz = work->b_zz;
+    int cid = work->cid;
+    int V = work->V, v = work->v, vv = work->vv;
+    int H = work->H, h = work->h, hh = work->hh;
+    free(work);
+
+    int16_t mat[8][8];
+    zigzag_to_mat(b_zz, mat);
+    free(b_zz);
+    double fmat[8][8];
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) fmat[i][j] = mat[i][j];
+    }
+    idct8x8(fmat);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) mat[i][j] = round(fmat[i][j]);
+    }
+    pthread_mutex_lock(&log_mutex);
+    fprintf(log_fp, "====\n");
+    fprintf(log_fp, "Component %d, block (%d, %d)\n", cid, V*v + vv, H*h + hh);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) fprintf(log_fp, "%d ", mat[i][j]);
+        fprintf(log_fp, "\n");
+    }
+    pthread_mutex_unlock(&log_mutex);
+    for (int i = 0; i < 8 && V*v*8 + vv*8 + i < jpg.comp[cid].height; i++) {
+        for (int j = 0; j < 8 && H*h*8 + hh*8 + j < jpg.comp[cid].width; j++) {
+            jpg.bmp_YCbCr[cid][V*v*8 + vv*8 + i][H*h*8 + hh*8 + j] = MAX(MIN(mat[i][j] + 128, 255), 0);
+        }
+    }
+}
+
+void *idct_worker(void *arg)
+{
+    while (1) {
+        pthread_mutex_lock(&work_list_mutex);
+        while (work_list == NULL) {
+            pthread_cond_wait(&work_list_cond, &work_list_mutex);
+        }
+        IDCTWork *work = work_list;
+        work_list = work->next;
+        if (work_list == NULL) work_list_back = NULL;
+        pthread_mutex_unlock(&work_list_mutex);
+        if (work->b_zz == NULL) {
+            free(work);
+            break;
+        }
+        do_idct_work(work);
+    }
+    pthread_exit(NULL);
+}
+
 void do_scan()
 {
     fprintf(log_fp, "\nStart scanning\n");
+    // initialize IDCT worker
+    idct_init();
+    work_list = work_list_back = NULL;
+    pthread_t tid;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    pthread_create(&tid, &attr, idct_worker, NULL);
+    pthread_attr_destroy(&attr);
+
     uint8_t byte = 0;
     int pos = -1;
     int cnt_h = (jpg.width - 1) / (jpg.maxH * 8) + 1,
@@ -73,30 +142,35 @@ void do_scan()
         for (int cid = 0; cid < jpg.n_comp; cid++) {
             int V = jpg.comp[cid].V, H = jpg.comp[cid].H;
             for (int vv = 0; vv < V; vv++) for (int hh = 0; hh < H; hh++) {
-                int16_t b_zz[64];
+                int16_t *b_zz = (int16_t*)malloc(sizeof(int16_t[64]));
                 decode_block(b_zz, &jpg.comp[cid], &byte, &pos);
-                fprintf(log_fp, "====\n");
-                fprintf(log_fp, "Component %d, block (%d, %d)\n", cid, V*v + vv, H*h + hh);
-                int16_t mat[8][8];
-                zigzag_to_mat(b_zz, mat);
-                double fmat[8][8];
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) fmat[i][j] = mat[i][j];
+                IDCTWork *work = (IDCTWork*)malloc(sizeof(IDCTWork));
+                *work = (IDCTWork){b_zz, cid, V, v, vv, H, h, hh};
+                pthread_mutex_lock(&work_list_mutex);
+                if (work_list_back == NULL) {
+                    work_list = work;
+                } else {
+                    work_list_back->next = work;
                 }
-                idct8x8(fmat);
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) mat[i][j] = round(fmat[i][j]);
-                }
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) fprintf(log_fp, "%d ", mat[i][j]);
-                    fprintf(log_fp, "\n");
-                }
-                for (int i = 0; i < 8 && V*v*8 + vv*8 + i < jpg.comp[cid].height; i++) {
-                    for (int j = 0; j < 8 && H*h*8 + hh*8 + j < jpg.comp[cid].width; j++) {
-                        jpg.bmp_YCbCr[cid][V*v*8 + vv*8 + i][H*h*8 + hh*8 + j] = MAX(MIN(mat[i][j] + 128, 255), 0);
-                    }
-                }
+                work_list_back = work;
+                pthread_cond_signal(&work_list_cond);
+                pthread_mutex_unlock(&work_list_mutex);
             }
         }
     }
+
+    // terminate worker
+    IDCTWork *work = (IDCTWork*)malloc(sizeof(IDCTWork));
+    work->b_zz = NULL;
+    work->next = NULL;
+    pthread_mutex_lock(&work_list_mutex);
+    if (work_list_back == NULL) {
+        work_list = work;
+    } else {
+        work_list_back->next = work;
+    }
+    work_list_back = work;
+    pthread_cond_signal(&work_list_cond);
+    pthread_mutex_unlock(&work_list_mutex);
+    pthread_join(tid, NULL);
 }
