@@ -7,13 +7,13 @@ uint8_t decode(Node *root, uint8_t *p_byte, int *p_pos)
 {
     Node *node = root;
     while (!IS_LEAF(node)) {
-        node = huffman_traverse(node, *p_byte, p_pos);
         if (*p_pos == -1) {
             *p_pos = 7;
             uint8_t prev = *p_byte;
             fread(p_byte, 1, 1, jpg.fp);
             if (prev == 0xff && *p_byte == 0) fread(p_byte, 1, 1, jpg.fp);
         }
+        node = huffman_traverse(node, *p_byte, p_pos);
     }
     return node->sym;
 }
