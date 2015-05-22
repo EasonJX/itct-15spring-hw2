@@ -1,4 +1,4 @@
-#include "jpeg_decoder.h"
+#include "jpeg_codec.h"
 
 extern JPEGData jpg;
 

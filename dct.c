@@ -1,4 +1,4 @@
-#include "jpeg_decoder.h"
+#include "jpeg_codec.h"
 
 double s[4], c[5], sq8;
 int idct_inited;

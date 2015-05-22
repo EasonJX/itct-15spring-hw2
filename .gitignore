@@ -33,4 +33,7 @@
 
 jpeg_decoder
 jpeg_decoder.log
+jpeg_encoder
+jpeg_encoder.log
 output.bmp
+output.jpg

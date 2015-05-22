@@ -1,4 +1,4 @@
-#include "jpeg_decoder.h"
+#include "jpeg_codec.h"
 
 void zigzag_to_mat(int16_t zigzag[64], int16_t mat[8][8])
 {

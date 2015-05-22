@@ -1,4 +1,4 @@
-#include "jpeg_decoder.h"
+#include "jpeg_codec.h"
 
 JPEGData jpg;
 FILE *log_fp;
