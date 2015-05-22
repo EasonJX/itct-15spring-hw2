@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
-#include <endian.h>
 #include <math.h>
 
 #include "struct.h"

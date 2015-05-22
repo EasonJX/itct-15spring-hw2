@@ -5,5 +5,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 void zigzag_to_mat(int16_t zigzag[64], int16_t mat[8][8]);
+uint16_t econv16(uint16_t n);
 
 #endif

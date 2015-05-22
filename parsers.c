@@ -27,8 +27,8 @@ void parse_DQT(DQTSegment *seg)
 void parse_SOF0(SOF0Segment *seg)
 {
     assert(seg->P == 8);
-    jpg.height = seg->height = be16toh(seg->height);
-    jpg.width = seg->width = be16toh(seg->width);
+    jpg.height = seg->height = econv16(seg->height);
+    jpg.width = seg->width = econv16(seg->width);
     for (int i = 0; i < 3; i++) {
         jpg.bmp_RGB[i] = (uint8_t**)malloc(jpg.height * sizeof(uint8_t*));
         for (int j = 0; j < jpg.height; j++) {

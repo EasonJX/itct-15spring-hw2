@@ -22,7 +22,7 @@ MarkerSegment *read_segment()
     MarkerSegment *seg = (MarkerSegment*)malloc(sizeof(MarkerSegment));
     uint16_t marker;
     fread(&marker, sizeof(uint16_t), 1, jpg.fp);
-    marker = be16toh(marker);
+    marker = econv16(marker);
     seg->type = marker_type(marker);
     switch (seg->type) {
     case SOI:
@@ -36,7 +36,7 @@ MarkerSegment *read_segment()
         return NULL;
     default:
         fread(&seg->len, sizeof(uint16_t), 1, jpg.fp);
-        seg->len = be16toh(seg->len);
+        seg->len = econv16(seg->len);
         seg->data.ptr = malloc(seg->len - 2);
         fread(seg->data.ptr, seg->len - 2, 1, jpg.fp);
     }
