@@ -63,6 +63,7 @@ void parse_SOF0(SOF0Segment *seg)
 void print_code(int code, int len)
 {
     for (int i = len - 1; i >= 0; i--) fputc('0' + ((code >> i) & 1), log_fp);
+    for (int i = 15; i >= len; i--) fputc(' ', log_fp);
 }
 
 void parse_DHT(DHTSegment *seg, int seg_len)
@@ -77,7 +78,7 @@ void parse_DHT(DHTSegment *seg, int seg_len)
         for (int i = 0; i < seg->n_len[len - 1]; i++) {
             huffman_insert(&jpg.huf[Tc][Th], code, len, seg->sym[pos]);
             print_code(code, len);
-            fprintf(log_fp, ": %d\n", seg->sym[pos]);
+            fprintf(log_fp, ": 0x%02x\n", seg->sym[pos]);
             pos++;
             code++;
         }
