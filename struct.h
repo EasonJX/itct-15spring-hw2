@@ -112,6 +112,8 @@ typedef struct {
 } JPEGData;
 
 MarkerType marker_type(uint16_t marker);
+uint16_t type_marker(MarkerType type);
 MarkerSegment *read_segment();
+void write_segment(MarkerSegment *seg);
 
 #endif

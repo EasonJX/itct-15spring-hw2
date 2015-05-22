@@ -12,3 +12,4 @@
 #include "scan.h"
 #include "dct.h"
 #include "output.h"
+#include "encode.h"
