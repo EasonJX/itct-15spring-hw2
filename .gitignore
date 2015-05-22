@@ -32,4 +32,5 @@
 *.dSYM/
 
 jpeg_decoder
+jpeg_decoder.log
 output.bmp

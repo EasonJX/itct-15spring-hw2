@@ -1,6 +1,7 @@
 #include "jpeg_decoder.h"
 
 extern JPEGData jpg;
+extern FILE *log_fp;
 
 uint8_t decode(Node *root, uint8_t *p_byte, int *p_pos)
 {
@@ -62,20 +63,20 @@ void decode_block(int16_t b_zz[64], Component *comp, uint8_t *p_byte, int *p_pos
 
 void do_scan()
 {
-    printf("\nStart scanning\n");
+    fprintf(log_fp, "\nStart scanning\n");
     uint8_t byte = 0;
     int pos = -1;
     int cnt_h = (jpg.width - 1) / (jpg.maxH * 8) + 1,
         cnt_v = (jpg.height - 1) / (jpg.maxV * 8) + 1;
-    printf("cnt_v = %d, cnt_h = %d\n", cnt_v, cnt_h);
+    fprintf(log_fp, "cnt_v = %d, cnt_h = %d\n", cnt_v, cnt_h);
     for (int v = 0; v < cnt_v; v++) for (int h = 0; h < cnt_h; h++) {
         for (int cid = 0; cid < jpg.n_comp; cid++) {
             int V = jpg.comp[cid].V, H = jpg.comp[cid].H;
             for (int vv = 0; vv < V; vv++) for (int hh = 0; hh < H; hh++) {
                 int16_t b_zz[64];
                 decode_block(b_zz, &jpg.comp[cid], &byte, &pos);
-                printf("====\n");
-                printf("Component %d, block (%d, %d)\n", cid, V*v + vv, H*h + hh);
+                fprintf(log_fp, "====\n");
+                fprintf(log_fp, "Component %d, block (%d, %d)\n", cid, V*v + vv, H*h + hh);
                 int16_t mat[8][8];
                 zigzag_to_mat(b_zz, mat);
                 double fmat[8][8];
@@ -87,8 +88,8 @@ void do_scan()
                     for (int j = 0; j < 8; j++) mat[i][j] = round(fmat[i][j]);
                 }
                 for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) printf("%d ", mat[i][j]);
-                    printf("\n");
+                    for (int j = 0; j < 8; j++) fprintf(log_fp, "%d ", mat[i][j]);
+                    fprintf(log_fp, "\n");
                 }
                 for (int i = 0; i < 8 && V*v*8 + vv*8 + i < jpg.comp[cid].height; i++) {
                     for (int j = 0; j < 8 && H*h*8 + hh*8 + j < jpg.comp[cid].width; j++) {

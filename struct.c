@@ -1,6 +1,7 @@
 #include "jpeg_decoder.h"
 
 extern JPEGData jpg;
+extern FILE *log_fp;
 
 MarkerType marker_type(uint16_t marker)
 {
@@ -40,6 +41,6 @@ MarkerSegment *read_segment()
         seg->data.ptr = malloc(seg->len - 2);
         fread(seg->data.ptr, seg->len - 2, 1, jpg.fp);
     }
-    printf("read segment, marker = %x, len = %d\n", marker, seg->len);
+    fprintf(log_fp, "read segment, marker = %x, len = %d\n", marker, seg->len);
     return seg;
 }
