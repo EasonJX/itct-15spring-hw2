@@ -13,7 +13,6 @@ void parse_DQT(DQTSegment *seg, int seg_len)
 {
     int Pq = HI(seg->PqTq), Tq = LO(seg->PqTq);
     assert(Pq == 0);
-    memcpy(jpg.qt_zz[Tq], seg->qt_zz, 64);
     for (int i = 0; i < 64; i++) jpg.qt_zz[Tq][i] = seg->qt_zz[i];
     fprintf(log_fp, "Tq = %d\n", Tq);
     fprintf(log_fp, "Quantization table:\n");
@@ -82,7 +81,7 @@ void parse_DHT(DHTSegment *seg, int seg_len)
             pos++;
             code++;
         }
-        if (code != 0) code <<= 1;
+        code <<= 1;
         off += seg->n_len[len - 1];
     }
     if (off != seg_len) parse_DHT((void*)seg + off, seg_len - off);
