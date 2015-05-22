@@ -1,3 +1,4 @@
 [submodule "libbmp"]
 	path = libbmp
 	url = https://github.com/lsc36/libbmp.git
+    ignore = dirty
